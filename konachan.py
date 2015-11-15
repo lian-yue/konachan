@@ -10,12 +10,13 @@ page = 1
 maxPage = 0
 
 
-fileDir = './File/%s.jpg'
+fileDir = os.path.split(os.path.realpath(__file__))[0] + '/File/%s.jpg'
 
 
-bufferSize = 1024 * 32
+bufferSize = 1024 * 64
 
 
+tagNameLenth = 128
 
 
 
@@ -75,7 +76,18 @@ while (isWhile):
 
 	for i in jsonContents:
 		if not i['id'] in downloads:
-			fileName = str(i['id']) + '_' + i['tags'].replace('/', ' ') + '_' + str(i['width']) + '_' + str(i['height']);
+			tags = i['tags'].replace('/', '.').split(' ')
+			tagName = ""
+			for x in tags:
+				if tagName:
+					tagName2 = tagName + ' ' + x
+				else:
+					tagName2 = x
+				if len(tagName) > tagNameLenth:
+					break
+				tagName = tagName2
+
+			fileName = str(i['id']) + '_' + tagName + '_' + str(i['width']) + '_' + str(i['height'])
 			downloads[fileName] = threading.Thread(target=downloadFile,args= (i['file_url'], fileName), name = 'thread-' + str(i['id']))
 			downloads[fileName].start()
 
@@ -108,4 +120,5 @@ while (isWhile):
 
 
 print "Complete"
+
 
